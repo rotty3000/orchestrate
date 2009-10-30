@@ -1,0 +1,526 @@
+<?xml version="1.0"?>
+
+<project name="build-common-plugin" xmlns:antelope="antlib:ise.antelope.tasks">
+	<import file="build-common.xml" />
+
+	<if>
+		<available file="docroot/WEB-INF/liferay-plugin-package.properties" />
+		<then>
+			<property file="docroot/WEB-INF/liferay-plugin-package.properties" prefix="plugin-package" />
+			<property name="plugin.version" value="${plugin-package.module-incremental-version}" />
+
+			<property file="docroot/WEB-INF/liferay-plugin-package.properties" prefix="plugin-package" />
+
+			<if>
+				<isset property="plugin-package.portal-dependency-jars" />
+				<then>
+					<property name="plugin.jars" value="${plugin-package.portal-dependency-jars}" />
+				</then>
+				<else>
+					<property name="plugin.jars" value="${plugin-package.portal.dependency.jars}" />
+				</else>
+			</if>
+
+			<property file="docroot/WEB-INF/liferay-plugin-package.properties" prefix="plugin-package" />
+
+			<if>
+				<isset property="plugin-package.portal-dependency-tlds" />
+				<then>
+					<property name="plugin.tlds" value="${plugin-package.portal-dependency-tlds}" />
+				</then>
+				<else>
+					<property name="plugin.tlds" value="${plugin-package.portal.dependency.tlds}" />
+				</else>
+			</if>
+		</then>
+	</if>
+
+	<antelope:stringutil string="${basedir}" property="plugin.name.beginindex">
+		<antelope:lastindexof string="${file.separator}" />
+	</antelope:stringutil>
+
+	<antelope:math
+		datatype="int"
+		operand1="${plugin.name.beginindex}"
+		operand2="1"
+		operation="+"
+		result="plugin.name.beginindex"
+	/>
+
+	<antelope:stringutil string="${basedir}" property="plugin.name">
+		<antelope:substring beginindex="${plugin.name.beginindex}" />
+	</antelope:stringutil>
+
+	<if>
+		<antelope:endswith string="${plugin.name}" with="-client" />
+		<then>
+			<property name="plugin.file" value="${project.dir}/dist/${plugin.name}-${lp.version}.${plugin.version}.jar" />
+		</then>
+		<else>
+			<property name="plugin.file" value="${project.dir}/dist/${plugin.name}-${lp.version}.${plugin.version}.war" />
+		</else>
+	</if>
+
+	<target name="all">
+		<antcall target="clean" />
+		<antcall target="deploy" />
+	</target>
+
+	<target name="clean" description="clean">
+		<delete dir="docroot/WEB-INF/classes" />
+		<delete dir="tmp" />
+		<delete file="${plugin.file}" />
+
+		<delete>
+			<fileset dir="docroot" includes="**/.sprite.png" />
+			<fileset dir="docroot" includes="**/.sprite.properties" />
+			<fileset dir="docroot" includes="**/Thumbs.db" />
+		</delete>
+
+		<antcall target="clean-portal-dependencies" />
+	</target>
+
+	<target name="clean-portal-dependencies">
+		<if>
+			<available file="docroot/WEB-INF/lib" />
+			<then>
+				<delete>
+					<fileset dir="docroot/WEB-INF/lib" includes="${required.portal.jars}" />
+					<fileset dir="docroot/WEB-INF/lib" includes="${plugin.jars}" />
+				</delete>
+			</then>
+		</if>
+
+		<if>
+			<available file="docroot/WEB-INF/tld" />
+			<then>
+				<delete>
+					<fileset dir="docroot/WEB-INF/tld" includes="${plugin.tlds}" />
+				</delete>
+			</then>
+		</if>
+	</target>
+
+	<target name="compile">
+		<antcall target="merge" />
+
+		<for param="js.file">
+			<path>
+				<fileset dir="docroot" includes="unpacked.js" />
+			</path>
+			<sequential>
+				<antelope:stringutil string="@{js.file}" property="js.file.unix">
+					<antelope:replace regex="\\" replacement="/" />
+				</antelope:stringutil>
+
+				<antelope:grep in="${js.file.unix}" regex="(.*/)(.*)" group="1" property="js.dir" />
+
+				<antcall target="build-javascript-cmd">
+					<param name="js.from.file" value="${js.file.unix}" />
+					<param name="js.to.file" value="${js.dir}packed.js" />
+				</antcall>
+			</sequential>
+		</for>
+
+		<mkdir dir="docroot/WEB-INF/classes" />
+		<mkdir dir="docroot/WEB-INF/lib" />
+
+		<copy todir="docroot/WEB-INF/lib">
+			<fileset dir="${app.server.lib.portal.dir}" includes="${plugin.jars}" />
+		</copy>
+
+		<copy todir="docroot/WEB-INF/tld">
+			<fileset dir="${app.server.portal.dir}/WEB-INF/tld" includes="${plugin.tlds}" />
+		</copy>
+
+		<if>
+			<available file="docroot/WEB-INF/src" />
+			<then>
+				<if>
+					<available file="tmp" />
+					<then>
+						<path id="plugin-lib.classpath">
+							<fileset dir="docroot/WEB-INF/lib" includes="*.jar" />
+							<fileset dir="tmp/WEB-INF/lib" includes="*.jar" />
+							<pathelement location="docroot/WEB-INF/classes" />
+							<pathelement location="tmp/WEB-INF/classes" />
+						</path>
+					</then>
+					<else>
+						<path id="plugin-lib.classpath">
+							<fileset dir="docroot/WEB-INF/lib" includes="*.jar" />
+							<pathelement location="docroot/WEB-INF/classes" />
+						</path>
+					</else>
+				</if>
+
+				<copy todir="docroot/WEB-INF/lib">
+					<fileset dir="${app.server.lib.portal.dir}" includes="${required.portal.jars}" />
+				</copy>
+
+				<if>
+					<available file="docroot/WEB-INF/lib/portal-impl.jar" />
+					<then>
+						<fail>
+.
+
+Detected inclusion of portal-impl.jar in WEB-INF/lib.
+
+portal-impl.jar is designed with a large number of singleton classes which are
+instantiated on the basis that they will exist alone in the application server.
+
+While compile time issues may be resolved, portlets cannot be made to work by
+simply adding portal-impl.jar, because doing so violates the above assumption,
+and the resulting problems will be extremely difficult to debug.
+
+Please find a solution that does not require portal-impl.jar.
+						</fail>
+					</then>
+				</if>
+
+				<if>
+					<equals arg1="${javac.compiler}" arg2="modern" />
+					<then>
+						<javac
+							classpathref="plugin.classpath"
+							compiler="${javac.compiler}"
+							debug="${javac.debug}"
+							deprecation="${javac.deprecation}"
+							destdir="docroot/WEB-INF/classes"
+							fork="${javac.fork}"
+							memoryMaximumSize="${javac.memoryMaximumSize}"
+							nowarn="${javac.nowarn}"
+							srcdir="docroot/WEB-INF/src"
+						/>
+					</then>
+					<else>
+						<javac
+							classpathref="plugin.classpath"
+							compiler="${javac.compiler}"
+							debug="${javac.debug}"
+							deprecation="${javac.deprecation}"
+							destdir="docroot/WEB-INF/classes"
+							nowarn="${javac.nowarn}"
+							srcdir="docroot/WEB-INF/src"
+						/>
+					</else>
+				</if>
+
+				<copy todir="docroot/WEB-INF/classes">
+					<fileset dir="docroot/WEB-INF/src" excludes="**/*.java" />
+				</copy>
+			</then>
+		</if>
+
+		<antcall target="merge" />
+	</target>
+
+	<target name="war" depends="compile">
+		<mkdir dir="${project.dir}/dist" />
+
+		<if>
+			<available file="tmp" />
+			<then>
+				<property name="docroot.dir" value="tmp" />
+			</then>
+			<else>
+				<property name="docroot.dir" value="docroot" />
+			</else>
+		</if>
+
+		<delete file="${plugin.file}" />
+
+		<antcall target="clean-portal-dependencies" />
+
+		<if>
+			<contains string="${app.server.dir}" substring="glassfish" />
+			<then>
+				<zip
+					basedir="${docroot.dir}"
+					destfile="${plugin.file}"
+					excludes="**/META-INF/context.xml"
+				/>
+			</then>
+		<else>
+				<zip
+					basedir="${docroot.dir}"
+					destfile="${plugin.file}"
+				/>
+			</else>
+		</if>
+	</target>
+
+	<target name="deploy" depends="war">
+		<copy file="${plugin.file}" todir="${auto.deploy.dir}" />
+	</target>
+
+	<target name="build-javascript-cmd">
+		<java
+			classname="com.yahoo.platform.yui.compressor.YUICompressor"
+			classpathref="lib.classpath"
+			fork="true"
+			newenvironment="true"
+		>
+			<arg line="--type js -o ${js.to.file} ${js.from.file}" />
+		</java>
+	</target>
+
+	<target name="build-lang-cmd">
+		<antcall target="build-lang-native2ascii-all" />
+
+		<java
+			classname="com.liferay.portal.tools.LangBuilder"
+			classpathref="portal.classpath"
+			fork="true"
+			newenvironment="true"
+		>
+			<jvmarg value="-Dexternal-properties=com/liferay/portal/tools/dependencies/portal-tools.properties" />
+			<jvmarg value="-Dfile.encoding=UTF-8" />
+			<jvmarg value="-Duser.country=US" />
+			<jvmarg value="-Duser.language=en" />
+			<arg value="${lang.dir}" />
+			<arg value="${lang.file}" />
+		</java>
+
+		<antcall target="build-lang-native2ascii-all" />
+
+		<copy file="${lang.dir}/${lang.file}.properties" tofile="${lang.dir}/${lang.file}_en.properties" />
+
+		<delete file="alfresco.log" />
+	</target>
+
+	<target name="build-lang-native2ascii">
+		<delete file="${lang.dir}/${lang.file}_${lang.code}.properties" failonerror="false" />
+
+		<exec dir="${lang.dir}" executable="cmd.exe" os="${os.windows}">
+			<arg line="/c '${env.JAVA_HOME}'/bin/native2ascii -encoding UTF-8 ${lang.file}_${lang.code}.properties.native ${lang.file}_${lang.code}.properties" />
+		</exec>
+
+		<exec dir="${lang.dir}" executable="${env.JAVA_HOME}/bin/native2ascii" os="${os.unix}">
+			<arg line="-encoding UTF-8 ${lang.file}_${lang.code}.properties.native ${lang.file}_${lang.code}.properties" />
+		</exec>
+
+		<exec dir="${lang.dir}" executable="/usr/bin/native2ascii" os="${os.apple}">
+			<arg line="-encoding UTF-8 ${lang.file}_${lang.code}.properties.native ${lang.file}_${lang.code}.properties" />
+		</exec>
+	</target>
+
+	<target name="build-lang-native2ascii-all">
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="ar" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="eu" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="bg" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="ca" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="zh_CN" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="zh_TW" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="cs" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="nl" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="fi" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="fr" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="de" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="el" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="hu" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="it" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="ja" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="ko" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="nb" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="fa" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="pl" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="pt_BR" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="pt_PT" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="ru" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="sk" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="es" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="sv" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="tr" />
+		</antcall>
+
+		<antcall target="build-lang-native2ascii">
+			<param name="lang.code" value="vi" />
+		</antcall>
+	</target>
+
+	<target name="build-service">
+		<mkdir dir="docroot/WEB-INF/classes" />
+		<mkdir dir="docroot/WEB-INF/lib" />
+		<mkdir dir="docroot/WEB-INF/service" />
+		<mkdir dir="docroot/WEB-INF/sql" />
+		<mkdir dir="docroot/WEB-INF/src" />
+
+		<copy todir="docroot/WEB-INF/classes">
+			<fileset dir="docroot/WEB-INF/src" excludes="**/*.java" />
+		</copy>
+
+		<path id="service.classpath">
+			<path refid="lib.classpath" />
+			<path refid="portal.classpath" />
+			<fileset dir="docroot/WEB-INF/lib" includes="*.jar" />
+			<pathelement location="docroot/WEB-INF/classes" />
+		</path>
+
+		<java
+			classname="com.liferay.portal.tools.servicebuilder.ServiceBuilder"
+			classpathref="service.classpath"
+			fork="true"
+			maxmemory="256m"
+			newenvironment="true"
+		>
+			<jvmarg value="-Dexternal-properties=com/liferay/portal/tools/dependencies/portal-tools.properties" />
+			<jvmarg value="-Dorg.apache.commons.logging.Log=org.apache.commons.logging.impl.Log4JLogger" />
+			<jvmarg value="-Dservice.input.file=docroot/WEB-INF/service.xml" />
+			<jvmarg value="-Dservice.hbm.file=docroot/WEB-INF/src/META-INF/portlet-hbm.xml" />
+			<jvmarg value="-Dservice.orm.file=docroot/WEB-INF/src/META-INF/portlet-orm.xml" />
+			<jvmarg value="-Dservice.model.hints.file=docroot/WEB-INF/src/META-INF/portlet-model-hints.xml" />
+			<jvmarg value="-Dservice.spring.file=docroot/WEB-INF/src/META-INF/portlet-spring.xml" />
+			<jvmarg value="-Dservice.spring.base.file=docroot/WEB-INF/src/META-INF/base-spring.xml" />
+			<jvmarg value="-Dservice.spring.dynamic.data.source.file=docroot/WEB-INF/src/META-INF/dynamic-data-source-spring.xml" />
+			<jvmarg value="-Dservice.spring.hibernate.file=docroot/WEB-INF/src/META-INF/hibernate-spring.xml" />
+			<jvmarg value="-Dservice.spring.infrastructure.file=docroot/WEB-INF/src/META-INF/infrastructure-spring.xml" />
+			<jvmarg value="-Dservice.api.dir=docroot/WEB-INF/service" />
+			<jvmarg value="-Dservice.impl.dir=docroot/WEB-INF/src" />
+			<!--<jvmarg value="-Dservice.json.file=docroot/js/service_unpacked.js" />-->
+			<jvmarg value="-Dservice.sql.dir=docroot/WEB-INF/sql" />
+			<jvmarg value="-Dservice.sql.file=tables.sql" />
+			<jvmarg value="-Dservice.sql.indexes.file=indexes.sql" />
+			<jvmarg value="-Dservice.sql.indexes.properties.file=indexes.properties" />
+			<jvmarg value="-Dservice.sql.sequences.file=sequences.sql" />
+			<jvmarg value="-Dservice.auto.namespace.tables=true" />
+			<jvmarg value="-Dservice.bean.locator.util=com.liferay.util.bean.PortletBeanLocatorUtil" />
+			<jvmarg value="-Dservice.props.util=com.liferay.util.service.ServiceProps" />
+			<jvmarg value="-Dservice.plugin.name=${plugin.name}" />
+		</java>
+
+		<delete file="ServiceBuilder.temp" />
+
+		<!--<antcall target="build-javascript-cmd">
+			<param name="js.from.file" value="docroot/js/service_unpacked.js" />
+			<param name="js.to.file" value="docroot/js/service_packed.js" />
+		</antcall>-->
+
+		<mkdir dir="docroot/WEB-INF/service-classes" />
+
+		<delete file="docroot/WEB-INF/lib/${plugin.name}-service.jar" />
+
+		<path id="service.classpath">
+			<fileset dir="${app.server.lib.global.dir}" includes="*.jar" />
+			<fileset dir="docroot/WEB-INF/lib" excludes="${plugin.name}-service.jar" includes="*.jar" />
+		</path>
+
+		<javac
+			classpathref="service.classpath"
+			compiler="${javac.compiler}"
+			debug="${javac.debug}"
+			deprecation="${javac.deprecation}"
+			destdir="docroot/WEB-INF/service-classes"
+			nowarn="${javac.nowarn}"
+			srcdir="docroot/WEB-INF/service"
+		/>
+
+		<zip
+			basedir="docroot/WEB-INF/service-classes"
+			destfile="docroot/WEB-INF/lib/${plugin.name}-service.jar"
+		/>
+
+		<delete dir="docroot/WEB-INF/service-classes" />
+	</target>
+
+	<target name="merge" if="original.war.file">
+		<if>
+			<not>
+				<uptodate srcfile="${original.war.file}" targetfile="tmp" />
+			</not>
+			<then>
+				<delete dir="tmp" />
+				<mkdir dir="tmp" />
+
+				<mkdir dir="tmp/WEB-INF/classes" />
+				<mkdir dir="tmp/WEB-INF/lib" />
+
+				<unzip dest="tmp" src="${original.war.file}" />
+
+				<copy todir="tmp" overwrite="true">
+					<fileset dir="docroot" />
+				</copy>
+			</then>
+		</if>
+
+		<copy todir="tmp" overwrite="false">
+			<fileset dir="docroot" />
+		</copy>
+	</target>
+</project>
