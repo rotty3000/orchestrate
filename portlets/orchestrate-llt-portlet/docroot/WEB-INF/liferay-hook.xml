@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE hook PUBLIC "-//Liferay//DTD Hook 5.2.0//EN" "http://www.liferay.com/dtd/liferay-hook_5_2_0.dtd">
+
+<hook>
+	<portal-properties>portal.properties</portal-properties>
+	<custom-jsp-dir>/WEB-INF/custom_jsps</custom-jsp-dir>
+
+	<!--
+
+	<service>
+		<service-type>com.liferay.portal.service.UserLocalService</service-type>
+		<service-impl>com.liferay.test.hook.service.impl.MyUserLocalServiceImpl</service-impl>
+	</service>
+
+	-->
+</hook>
