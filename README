@@ -1,0 +1,17 @@
+================================================================================
+Orchestrate
+================================================================================
+
+The Orchestrate project represents the modular foundation which will provide
+support for OSGi in Liferay portal. As such it will contain the code for the
+base bundles providing management of OSGi framework (and bundles), and
+specifically implementations of the following OSGi specifications:
+
+- Http Service Specification
+- Web Applications Specification
+
+Other required OSGi specifications will be supplied by existing
+implementations provided by other open source projects where applicable.
+
+In the future the Orchestrate project may implement other OSGi specifications as
+the need arises.
