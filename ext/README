@@ -1,0 +1,10 @@
+WARNING: AVOID EXT PLUGINS AT ALL COST!
+
+One of the primary goals of OSGi support in Liferay is to eliminate the need for
+EXT plugins completely.
+
+It's better in the long run for Liferay to fix the architecture to eliminate the
+need for EXT than for developers to take the EXT approach.
+
+The MAIN use of EXT involves extending or overloading a core class. With plugins
+this is impossible, but with OSGi it is.
