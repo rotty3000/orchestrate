@@ -1,6 +1,6 @@
 <?xml version="1.0"?>
 
-<project name="portlet" basedir="." default="deploy" xmlns:antelope="antlib:ise.antelope.tasks">
+<project name="@portlet.name@-portlet" basedir="." default="deploy" xmlns:antelope="antlib:ise.antelope.tasks">
 	<import file="../build-common-portlet.xml" />
 
 	<path id="plugin-lib.classpath">
@@ -9,69 +9,30 @@
 	</path>
 
 	<taskdef name="groovyc"
-			classname="org.codehaus.groovy.ant.Groovyc"
-			classpathref="plugin-lib.classpath"/>
+		classname="org.codehaus.groovy.ant.Groovyc"
+		classpathref="plugin-lib.classpath"
+	/>
 
-	<target name="compile">
-		<antcall target="merge" />
+	<target name="compile" depends="build-common-plugin.compile">
+		<groovyc
+			classpathref="plugin.classpath"
+			destdir="docroot/WEB-INF/classes"
+			srcdir="docroot/WEB-INF/src"
+		>
+			<javac
+				compiler="${javac.compiler}"
+				debug="${javac.debug}"
+				deprecation="${javac.deprecation}"
+				fork="${javac.fork}"
+				memoryMaximumSize="${javac.memoryMaximumSize}"
+				nowarn="${javac.nowarn}"
 
-		<for param="js.file">
-			<path>
-				<fileset dir="docroot" includes="unpacked.js" />
-			</path>
-			<sequential>
-				<antelope:stringutil string="@{js.file}" property="js.file.unix">
-					<antelope:replace regex="\\" replacement="/" />
-				</antelope:stringutil>
+			/>
+		</groovyc>
 
-				<antelope:grep in="${js.file.unix}" regex="(.*/)(.*)" group="1" property="js.dir" />
-
-				<antcall target="build-javascript-cmd">
-					<param name="js.from.file" value="${js.file.unix}" />
-					<param name="js.to.file" value="${js.dir}packed.js" />
-				</antcall>
-			</sequential>
-		</for>
-
-		<mkdir dir="docroot/WEB-INF/classes" />
-		<mkdir dir="docroot/WEB-INF/lib" />
-
-		<copy todir="docroot/WEB-INF/lib">
-			<fileset dir="${app.server.lib.portal.dir}" includes="${plugin.jars}" />
+		<copy todir="docroot/WEB-INF/classes">
+			<fileset dir="docroot/WEB-INF/src" excludes="**/*.groovy,**/*.java" />
 		</copy>
-
-		<copy todir="docroot/WEB-INF/tld">
-			<fileset dir="${app.server.portal.dir}/WEB-INF/tld" includes="${plugin.tlds}" />
-		</copy>
-
-		<if>
-			<available file="docroot/WEB-INF/src" />
-			<then>
-				<copy todir="docroot/WEB-INF/lib">
-					<fileset dir="${app.server.lib.portal.dir}" includes="${required.portal.jars}" />
-				</copy>
-
-				<groovyc
-					classpathref="plugin.classpath"
-					destdir="docroot/WEB-INF/classes"
-					srcdir="docroot/WEB-INF/src"
-				>
-					<javac
-						compiler="${javac.compiler}"
-						debug="${javac.debug}"
-						deprecation="${javac.deprecation}"
-						fork="${javac.fork}"
-						memoryMaximumSize="${javac.memoryMaximumSize}"
-						nowarn="${javac.nowarn}"
-
-					/>
-				</groovyc>
-
-				<copy todir="docroot/WEB-INF/classes">
-					<fileset dir="docroot/WEB-INF/src" excludes="**/*.groovy,**/*.java" />
-				</copy>
-			</then>
-		</if>
 
 		<antcall target="merge" />
 	</target>

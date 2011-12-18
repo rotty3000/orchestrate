@@ -1,4 +1,5 @@
 <?xml version="1.0"?>
+<!DOCTYPE project>
 
 <project name="layouttpl" basedir="." default="deploy" xmlns:antelope="antlib:ise.antelope.tasks">
 	<property name="project.dir" value=".." />
@@ -7,47 +8,68 @@
 
 	<target name="create">
 		<if>
-			<equals arg1="${layouttpl.name}" arg2="$${layouttpl.name}" />
+			<or>
+				<not>
+					<isset property="layouttpl.name" />
+				</not>
+				<not>
+					<isset property="layouttpl.display.name" />
+				</not>
+			</or>
 			<then>
 				<echo message="This task must be called by the create script." />
 			</then>
 			<else>
 				<if>
-					<available file="${layouttpl.name}-layouttpl" />
+					<not>
+						<isset property="layouttpl.parent.dir" />
+					</not>
 					<then>
-						<echo message="${layouttpl.name}-layouttpl already exists." />
+						<property name="layouttpl.parent.dir" value="${basedir}" />
 					</then>
-					<else>
-						<antelope:stringutil string="${layouttpl.name}" property="layouttpl.template.name">
-							<replace regex="-" replacement="_" />
-						</antelope:stringutil>
-
-						<unzip src="layouttpl.zip" dest="${layouttpl.name}-layouttpl" />
-
-						<replace dir="${layouttpl.name}-layouttpl">
-							<replacefilter token="@layouttpl.name@" value="${layouttpl.name}" />
-							<replacefilter token="@layouttpl.display.name@" value="${layouttpl.display.name}" />
-							<replacefilter token="@layouttpl.template.name@" value="${layouttpl.template.name}" />
-						</replace>
-
-						<move
-							file="${layouttpl.name}-layouttpl/docroot/blank_columns.png"
-							tofile="${layouttpl.name}-layouttpl/docroot/${layouttpl.template.name}.png"
-						/>
-
-						<move
-							file="${layouttpl.name}-layouttpl/docroot/blank_columns.tpl"
-							tofile="${layouttpl.name}-layouttpl/docroot/${layouttpl.template.name}.tpl"
-						/>
-
-						<move
-							file="${layouttpl.name}-layouttpl/docroot/blank_columns.wap.tpl"
-							tofile="${layouttpl.name}-layouttpl/docroot/${layouttpl.template.name}.wap.tpl"
-						/>
-
-						<touch file="${layouttpl.name}-layouttpl/docroot/${layouttpl.template.name}.wap.tpl" />
-					</else>
 				</if>
+
+				<property name="layouttpl.dir" value="${layouttpl.parent.dir}/${layouttpl.name}-layouttpl" />
+
+				<if>
+					<available file="${layouttpl.dir}" />
+					<then>
+						<fail>${layouttpl.name}-layouttpl already exists.</fail>
+					</then>
+				</if>
+
+				<copy todir="${layouttpl.dir}">
+					<fileset
+						dir="${project.dir}/tools/layouttpl_tmpl"
+					/>
+				</copy>
+
+				<antelope:stringutil string="${layouttpl.name}" property="layouttpl.template.name">
+					<replace regex="-" replacement="_" />
+				</antelope:stringutil>
+
+				<replace dir="${layouttpl.dir}">
+					<replacefilter token="@layouttpl.name@" value="${layouttpl.name}" />
+					<replacefilter token="@layouttpl.display.name@" value="${layouttpl.display.name}" />
+					<replacefilter token="@layouttpl.template.name@" value="${layouttpl.template.name}" />
+				</replace>
+
+				<move
+					file="${layouttpl.dir}/docroot/blank_columns.png"
+					tofile="${layouttpl.dir}/docroot/${layouttpl.template.name}.png"
+				/>
+
+				<move
+					file="${layouttpl.dir}/docroot/blank_columns.tpl"
+					tofile="${layouttpl.dir}/docroot/${layouttpl.template.name}.tpl"
+				/>
+
+				<move
+					file="${layouttpl.dir}/docroot/blank_columns.wap.tpl"
+					tofile="${layouttpl.dir}/docroot/${layouttpl.template.name}.wap.tpl"
+				/>
+
+				<touch file="${layouttpl.dir}/docroot/${layouttpl.template.name}.wap.tpl" />
 			</else>
 		</if>
 	</target>

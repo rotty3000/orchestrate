@@ -1,12 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
-	<classpathentry kind="src" path="portlets/orchestrate-llt-portlet/docroot/WEB-INF/src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="var" path="PORTAL_53X_DEPLOY/lib/ext/portal-kernel.jar"/>
-	<classpathentry kind="var" path="PORTAL_53X_DEPLOY/lib/ext/portal-service.jar"/>
-	<classpathentry kind="var" path="PORTAL_53X_DEPLOY/lib/ext/portlet.jar"/>
-	<classpathentry kind="var" path="PORTAL_53X_DEPLOY/temp/liferay/com/liferay/portal/deploy/dependencies/util-bridges.jar"/>
-	<classpathentry kind="var" path="PORTAL_53X_DEPLOY/temp/liferay/com/liferay/portal/deploy/dependencies/util-java.jar"/>
-	<classpathentry kind="var" path="PORTAL_53X_DEPLOY/temp/liferay/com/liferay/portal/deploy/dependencies/util-taglib.jar"/>
+	<classpathentry kind="lib" path="lib/activation.jar"/>
+	<classpathentry kind="lib" path="lib/ant-contrib.jar"/>
+	<classpathentry kind="lib" path="lib/antelope.jar"/>
+	<classpathentry kind="lib" path="lib/ecj.jar"/>
+	<classpathentry kind="lib" path="lib/jalopy.jar"/>
+	<classpathentry kind="lib" path="lib/junit.jar"/>
+	<classpathentry kind="lib" path="lib/log4j.jar"/>
+	<classpathentry kind="lib" path="lib/mail.jar"/>
+	<classpathentry kind="lib" path="lib/qdox.jar"/>
+	<classpathentry kind="lib" path="lib/serializer.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.osgi_3.7.0.v20110613.jar" sourcepath="/home/rotty/DOWN/TARBALL-BIN/equinox-SDK-3.7/plugins/org.eclipse.osgi.source_3.7.0.v20110613.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.osgi.util_3.2.200.v20110110.jar" sourcepath="/home/rotty/DOWN/TARBALL-BIN/equinox-SDK-3.7/plugins/org.eclipse.osgi.util.source_3.2.200.v20110110.jar"/>
+	<classpathentry kind="lib" path="lib/org.eclipse.osgi.services_3.3.0.v20110513.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

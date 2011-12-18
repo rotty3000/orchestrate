@@ -1,17 +1,22 @@
-# Can ignore specific files
 .DS_Store
+.sass-cache/
+.sass_cache_*.css
+_sass_cache_*.css
+/build.*.properties
 
-# Use wildcards as well
 *~
 *.swp
+*-ext.properties
 
-# Can also ignore all directories and files in a directory.
-tmp/**/*
-
-bin
-hooks/*/docroot/WEB-INF/classes/**/*
-layouttpl/*/docroot/WEB-INF/classes/**/*
-portlets/*/docroot/WEB-INF/classes/**/*
-themes/*/docroot/WEB-INF/classes/**/*
-webs/*/docroot/WEB-INF/classes/**/*
-build.*.properties
+/*/*/bin
+/*/*/classes
+/*/*/docroot/WEB-INF/classes
+/*/*/tmp
+/bin
+/dist
+/hooks/*/docroot/WEB-INF/classes/**/*
+/layouttpl/*/docroot/WEB-INF/classes/**/*
+/portlets/*/docroot/WEB-INF/classes/**/*
+/tmp/**/*
+/themes/*/docroot/WEB-INF/classes/**/*
+/webs/*/docroot/WEB-INF/classes/**/*
