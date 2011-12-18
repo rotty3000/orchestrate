@@ -1,0 +1,73 @@
+<?xml version="1.0"?>
+<!DOCTYPE project>
+
+<project name="osgi-admin-portlet" basedir="." default="deploy">
+	<import file="../build-common-portlet.xml" />
+
+	<path id="plugin.classpath">
+		<path refid="plugin-lib.classpath" />
+		<fileset dir="${app.server.lib.global.dir}" includes="*.jar" />
+		<fileset dir="${app.server.lib.portal.dir}" includes="annotations.jar,commons-logging.jar,log4j.jar,portal-impl.jar,util-bridges.jar,util-java.jar,util-taglib.jar" />
+		<fileset dir="${project.dir}/lib" includes="*.jar" />
+		<fileset dir="${project.dir}/dist" includes="freemarker-mvc-portlet-support-0.0.1.jar" />
+	</path>
+
+	<taskdef resource="aQute/bnd/ant/taskdef.properties" classpathref="lib.classpath" />
+
+	<bndexpand propertyfile="docroot/WEB-INF/bnd.bnd" />
+
+	<script classpathref="portal.classpath" language="beanshell">
+		<![CDATA[
+			String projectDir = project.getProperty("project.dir");
+			String bundleSymbolicName = project.getProperty("Bundle-SymbolicName");
+			String bundleVersion = project.getProperty("Bundle-Version");
+
+			project.setProperty(
+				"plugin.file",
+				projectDir + "/dist/" + bundleSymbolicName + "-" +
+					bundleVersion + ".jar");
+		]]>
+	</script>
+
+	<target name="jar" depends="compile">
+		<delete>
+			<filename name="${plugin.file}"/>
+			<fileset dir="docroot/WEB-INF/lib" includes="${required.portal.jars}" />
+		</delete>
+
+		<mkdir dir="docroot/WEB-INF/tld" />
+
+		<copy todir="docroot/WEB-INF/tld">
+			<fileset dir="${app.server.portal.dir}/WEB-INF/tld">
+				<include name="aui.tld" />
+				<include name="liferay-faces.tld" />
+				<include name="liferay-portlet.tld" />
+				<include name="liferay-portlet-ext.tld" />
+				<include name="liferay-security.tld" />
+				<include name="liferay-theme.tld" />
+				<include name="liferay-ui.tld" />
+				<include name="liferay-util.tld" />
+			</fileset>
+		</copy>
+
+		<bnd
+			eclipse="false"
+			exceptions="true"
+			failok="false"
+			output="${project.dir}/dist"
+			sourcepath="docroot/WEB-INF/src"
+		>
+			<classpath>
+				<pathelement location="docroot/WEB-INF/classes" />
+			</classpath>
+
+			<bndfiles path="docroot/WEB-INF/bnd.bnd" />
+		</bnd>
+
+		<move file="${project.dir}/dist/${Bundle-SymbolicName}.jar" tofile="${plugin.file}" />
+	</target>
+
+	<target name="war">
+		<antcall target="jar" />
+	</target>
+</project>
