@@ -22,7 +22,7 @@ import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.osgi.OSGiConstants;
-import com.liferay.portal.struts.StrutsActionRegistry;
+import com.liferay.portal.struts.StrutsActionRegistryUtil;
 
 import java.util.Hashtable;
 
@@ -64,7 +64,7 @@ public class Activator
 
 			_osgiServlet.init(servletConfig);
 
-			StrutsActionRegistry.register(
+			StrutsActionRegistryUtil.register(
 				OSGiServlet.SERVLET_MAPPING, _osgiServlet);
 
 			_webPluginDeployer = new WebPluginDeployer(
@@ -90,7 +90,7 @@ public class Activator
 
 		_bundleContext.removeBundleListener(_webPluginDeployer);
 
-		StrutsActionRegistry.unregister(OSGiServlet.SERVLET_MAPPING);
+		StrutsActionRegistryUtil.unregister(OSGiServlet.SERVLET_MAPPING);
 
 		_osgiServlet.destroy();
 	}
