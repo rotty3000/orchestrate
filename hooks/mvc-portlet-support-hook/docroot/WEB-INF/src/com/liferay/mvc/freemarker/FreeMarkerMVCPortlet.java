@@ -14,6 +14,7 @@
 
 package com.liferay.mvc.freemarker;
 
+import com.liferay.mvc.MVCPortlet;
 import com.liferay.mvc.freemarker.internal.FreeMarkerMVCContextHelper;
 import com.liferay.portal.kernel.concurrent.ConcurrentHashSet;
 import com.liferay.portal.kernel.freemarker.FreeMarkerContext;
@@ -23,7 +24,6 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.HttpUtil;
 import com.liferay.portal.kernel.util.UnsyncPrintWriterPool;
-import com.liferay.util.bridges.mvc.MVCPortlet;
 
 import java.io.IOException;
 import java.io.Writer;

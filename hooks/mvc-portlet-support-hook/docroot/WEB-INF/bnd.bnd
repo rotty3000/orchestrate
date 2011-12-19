@@ -1,8 +1,9 @@
-Bundle-Name: Freemarker MVC Portlet Support
-Bundle-SymbolicName: freemarker-mvc-portlet-support
+Bundle-Name: MVC Portlet Support
+Bundle-SymbolicName: mvc-portlet-support
 Bundle-Vendor: Liferay, Inc.
 Bundle-Version: 0.0.1
 Export-Package: \
+	com.liferay.mvc,\
 	com.liferay.mvc.freemarker
 Import-Package: \
 	com.liferay.portal.freemarker,\
