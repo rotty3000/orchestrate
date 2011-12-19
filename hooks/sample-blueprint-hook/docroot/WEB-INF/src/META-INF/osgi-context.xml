@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<blueprint xmlns="http://www.osgi.org/xmlns/blueprint/v1.0.0">
+
+	<reference
+		id="originalUserLocalService"
+		availability="mandatory"
+		interface="com.liferay.portal.service.UserLocalService"
+		filter="(original.bean=*)"
+	>
+		<reference-listener
+			bind-method="setUserLocalService"
+			ref="com.liferay.sample.blueprint.CustomUserLocalService"
+		/>
+	</reference>
+
+	<bean
+		id="com.liferay.sample.blueprint.CustomUserLocalService"
+		class="com.liferay.sample.blueprint.CustomUserLocalService"
+	>
+		<property name="userLocalService" ref="originalUserLocalService" />
+	</bean>
+
+	<service
+		id="customUserLocalService"
+		ref="com.liferay.sample.blueprint.CustomUserLocalService"
+		interface="com.liferay.portal.service.UserLocalService"
+	>
+		<service-properties>
+			<entry
+				key="bean.id"
+				value="com.liferay.portal.service.UserLocalService"
+			/>
+		</service-properties>
+	</service>
+
+</blueprint>
