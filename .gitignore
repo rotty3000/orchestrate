@@ -20,3 +20,5 @@ _sass_cache_*.css
 /tmp/**/*
 /themes/*/docroot/WEB-INF/classes/**/*
 /webs/*/docroot/WEB-INF/classes/**/*
+
+/hooks/mvc-portlet-support-hook/docroot/WEB-INF/lib/freemarker.jar
