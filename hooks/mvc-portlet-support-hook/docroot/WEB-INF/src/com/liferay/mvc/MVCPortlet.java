@@ -139,19 +139,4 @@ public class MVCPortlet extends com.liferay.util.bridges.mvc.MVCPortlet {
 
 	protected static String _TEMPLATE_TOKEN = "jsp";
 
-	protected ActionCommandCache _actionCommandCache;
-
-	protected String aboutJSP;
-	protected boolean clearRequestParameters;
-	protected String configJSP;
-	protected boolean copyRequestParameters;
-	protected String editDefaultsJSP;
-	protected String editGuestJSP;
-	protected String editJSP;
-	protected String helpJSP;
-	protected String jspPath;
-	protected String previewJSP;
-	protected String printJSP;
-	protected String viewJSP;
-
 }
