@@ -24,13 +24,17 @@ import com.liferay.web.extender.deploy.WebPluginDeployer;
 import com.liferay.web.extender.servlet.BundleServletConfig;
 import com.liferay.web.extender.servlet.OSGiServlet;
 
+import java.util.Dictionary;
+import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.servlet.ServletConfig;
 import javax.servlet.ServletContext;
 
+import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.osgi.framework.BundleException;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
 import org.osgi.util.tracker.ServiceTracker;
@@ -76,6 +80,8 @@ public class Activator
 			_log.error(e, e);
 		}
 
+		checkStartableBundles();
+
 		return servletContext;
 	}
 
@@ -87,6 +93,8 @@ public class Activator
 	public void removedService(
 		ServiceReference<ServletContext> serviceReference,
 		ServletContext servletContext) {
+
+		checkStoppableBundles();
 
 		_bundleContext.removeBundleListener(_webPluginDeployer);
 
@@ -119,6 +127,63 @@ public class Activator
 
 	public void stop(BundleContext bundleContext) throws Exception {
 		_servletContextTracker.close();
+	}
+
+	protected void checkStartableBundles() {
+		for (Bundle bundle : _bundleContext.getBundles()) {
+			Dictionary<String,String> headers = bundle.getHeaders();
+
+			Enumeration<String> keys = headers.keys();
+
+			while (keys.hasMoreElements()) {
+				String key = keys.nextElement();
+
+				if (key.equals(OSGiConstants.WEB_CONTEXTPATH)) {
+					if ((bundle.getState() == Bundle.ACTIVE)) {
+						try {
+							bundle.stop();
+						}
+						catch (BundleException e) {
+							_log.error(e, e);
+						}
+					}
+
+					try {
+						bundle.start();
+					}
+					catch (BundleException e) {
+						_log.error(e, e);
+					}
+
+					continue;
+				}
+			}
+		}
+	}
+
+	protected void checkStoppableBundles() {
+		for (Bundle bundle : _bundleContext.getBundles()) {
+			Dictionary<String,String> headers = bundle.getHeaders();
+
+			Enumeration<String> keys = headers.keys();
+
+			while (keys.hasMoreElements()) {
+				String key = keys.nextElement();
+
+				if (key.equals(OSGiConstants.WEB_CONTEXTPATH) &&
+					(bundle.getState() == Bundle.ACTIVE)) {
+
+					try {
+						bundle.stop();
+					}
+					catch (BundleException e) {
+						_log.error(e, e);
+					}
+
+					continue;
+				}
+			}
+		}
 	}
 
 	private static Log _log = LogFactoryUtil.getLog(Activator.class);
