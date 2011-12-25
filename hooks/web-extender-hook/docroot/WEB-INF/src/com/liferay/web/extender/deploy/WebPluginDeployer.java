@@ -139,8 +139,6 @@ public class WebPluginDeployer implements BundleListener {
 
 			bundleServletContext.open();
 
-			_deployedWabs.add(bundleServletContext);
-
 			sendEvent(bundle, "org/osgi/service/web/DEPLOYED", null, false);
 		}
 		catch (Exception e) {
@@ -272,8 +270,6 @@ public class WebPluginDeployer implements BundleListener {
 	private BundleContext _bundleContext;
 	private List<Bundle> _collidedWabs = Collections.synchronizedList(
 		new ArrayList<Bundle>());
-	private List<BundleServletContext> _deployedWabs =
-		Collections.synchronizedList(new ArrayList<BundleServletContext>());
 	private ServiceTracker<EventAdmin, EventAdmin> _eventAdminTracker;
 	private ServiceTracker<ServletContext, ServletContext> _servletContextTracker;
 	private Servlet _portletServlet;
