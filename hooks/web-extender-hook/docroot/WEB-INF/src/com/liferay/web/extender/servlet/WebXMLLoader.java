@@ -276,7 +276,7 @@ public class WebXMLLoader {
 
 	private static final String _DEFAULT_WEB = ContentUtil.get(
 		WebXMLLoader.class.getClassLoader(),
-		"com/liferay/osgi/extender/servlet/dependencies/web.xml");
+		"com/liferay/web/extender/servlet/dependencies/web.xml");
 	private static String _RESOURCE_PREFIX = "/*.";
 
 	private static final Log _log = LogFactoryUtil.getLog(WebXMLLoader.class);
