@@ -25,6 +25,7 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.kernel.util.WebKeys;
 import com.liferay.portal.osgi.OSGiConstants;
 import com.liferay.portal.util.PortalUtil;
+import com.liferay.web.extender.service.ExtendedHttpService;
 import com.liferay.web.extender.service.HttpServiceFactory;
 
 import java.io.IOException;
@@ -67,8 +68,10 @@ public class OSGiServlet extends PortletServlet implements StrutsAction {
 			_bundleContext);
 
 		_bundleContext.registerService(
-			new String[] {HttpService.class.getName()}, httpServiceFactory,
-			properties);
+			new String[] {
+				HttpService.class.getName(),
+				ExtendedHttpService.class.getName()},
+			httpServiceFactory, properties);
 	}
 
 	public String execute(
