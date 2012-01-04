@@ -89,14 +89,25 @@ public class BundleServletContext extends LiferayServletContext {
 	}
 
 	public void close() {
+		if (_httpServiceTracker == null) {
+			return;
+		}
+
 		_httpServiceTracker.close();
 	}
 
 	@Override
 	public Object getAttribute(String name) {
+		if (name.equals("bundle.classloader")) {
+			return _classLoader;
+		}
+
 		Object value = _contextAttributes.get(name);
 
-		if (value != null) {
+		if ((value != null) ||
+			name.equals(
+				"org.springframework.web.context.WebApplicationContext.ROOT")) {
+
 			return value;
 		}
 
@@ -207,7 +218,12 @@ public class BundleServletContext extends LiferayServletContext {
 	public URL getResource(String path) throws MalformedURLException {
 		Bundle bundle = (Bundle)getAttribute(OSGiConstants.OSGI_BUNDLE);
 
-		return bundle.getEntry(path);
+		try {
+			return bundle.getEntry(path);
+		}
+		catch (IllegalStateException ise) {
+			return null;
+		}
 	}
 
 	@Override
@@ -261,7 +277,7 @@ public class BundleServletContext extends LiferayServletContext {
 
 		Dictionary<String,String> headers = bundle.getHeaders();
 
-		String webContextPath = headers.get("Web-ContextPath");
+		String webContextPath = headers.get(OSGiConstants.WEB_CONTEXTPATH);
 
 		BundleContext bundleContext = bundle.getBundleContext();
 
@@ -300,10 +316,10 @@ public class BundleServletContext extends LiferayServletContext {
 		throws ServletException {
 
 		if (listener instanceof HttpSessionListener) {
-			throw new UnsupportedOperationException();
+			// TODO throw new UnsupportedOperationException();
 		}
 		else if (listener instanceof HttpSessionAttributeListener) {
-			throw new UnsupportedOperationException();
+			// TODO throw new UnsupportedOperationException();
 		}
 		else if (listener instanceof ServletContextListener) {
 			ServletContextListener servletContextListener =
@@ -320,10 +336,10 @@ public class BundleServletContext extends LiferayServletContext {
 				(ServletContextAttributeListener)listener);
 		}
 		else if (listener instanceof ServletRequestListener) {
-			throw new UnsupportedOperationException();
+			// TODO throw new UnsupportedOperationException();
 		}
 		else if (listener instanceof ServletRequestAttributeListener) {
-			throw new UnsupportedOperationException();
+			// TODO throw new UnsupportedOperationException();
 		}
 	}
 

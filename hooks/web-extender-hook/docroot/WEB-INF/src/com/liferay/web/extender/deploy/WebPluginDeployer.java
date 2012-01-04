@@ -24,6 +24,8 @@ import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.osgi.OSGiConstants;
 import com.liferay.web.extender.servlet.BundleServletContext;
 
+import java.lang.reflect.Method;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Dictionary;
@@ -142,9 +144,7 @@ public class WebPluginDeployer implements BundleListener {
 			sendEvent(bundle, "org/osgi/service/web/DEPLOYED", null, false);
 		}
 		catch (Exception e) {
-			if (bundleServletContext != null) {
-				bundleServletContext.close();
-			}
+			destroy(bundleServletContext);
 
 			sendEvent(bundle, "org/osgi/service/web/FAILED", e, false);
 		}
@@ -164,18 +164,34 @@ public class WebPluginDeployer implements BundleListener {
 			return;
 		}
 
-		BundleServletContext bundleServletContext =
-			(BundleServletContext)servletContext;
+		ClassLoader classLoader = (ClassLoader)servletContext.getAttribute(
+			"bundle.classloader");
 
 		HotDeployUtil.fireUndeployEvent(
-			new HotDeployEvent(
-				servletContext, bundleServletContext.getClassLoader()));
+			new HotDeployEvent(servletContext, classLoader));
 
-		bundleServletContext.close();
+		destroy(servletContext);
 
 		sendEvent(bundle, "org/osgi/service/web/UNDEPLOYED", null, false);
 
 		handleCollidedWabs(servletContextName);
+	}
+
+	protected void destroy(ServletContext servletContext) {
+		if (servletContext == null) {
+			return;
+		}
+
+		try {
+			Method method = servletContext.getClass().getMethod("close", null);
+
+			if (method != null) {
+				method.invoke(servletContext, null);
+			}
+		}
+		catch (Exception e) {
+			_log.error(e, e);
+		}
 	}
 
 	protected void handleCollidedWabs(String servletContextName)
@@ -187,15 +203,15 @@ public class WebPluginDeployer implements BundleListener {
 
 		Bundle candidate = null;
 
-		for (Bundle collided : _collidedWabs) {
-			String contextName = BundleServletContext.getServletContextName(
-				collided);
+		for (Bundle collidedWab : _collidedWabs) {
+			String curServletContextName =
+				BundleServletContext.getServletContextName(collidedWab);
 
-			if (servletContextName.equals(contextName) &&
+			if (servletContextName.equals(curServletContextName) &&
 				((candidate == null) ||
-				 (collided.getBundleId() < collided.getBundleId()))) {
+				 (collidedWab.getBundleId() < collidedWab.getBundleId()))) {
 
-				candidate = collided;
+				candidate = collidedWab;
 			}
 		}
 

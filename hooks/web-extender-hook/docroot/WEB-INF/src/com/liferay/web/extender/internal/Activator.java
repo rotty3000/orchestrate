@@ -18,14 +18,15 @@ import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.ReleaseInfo;
 import com.liferay.portal.kernel.util.StringBundler;
+import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.osgi.OSGiConstants;
 import com.liferay.portal.struts.StrutsActionRegistryUtil;
 import com.liferay.web.extender.deploy.WebPluginDeployer;
+import com.liferay.web.extender.internal.webbundle.WebBundleURLStreamHandlerService;
 import com.liferay.web.extender.servlet.BundleServletConfig;
 import com.liferay.web.extender.servlet.OSGiServlet;
 
 import java.util.Dictionary;
-import java.util.Enumeration;
 import java.util.Hashtable;
 
 import javax.servlet.ServletConfig;
@@ -34,9 +35,10 @@ import javax.servlet.ServletContext;
 import org.osgi.framework.Bundle;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
-import org.osgi.framework.BundleException;
 import org.osgi.framework.Filter;
 import org.osgi.framework.ServiceReference;
+import org.osgi.service.url.URLConstants;
+import org.osgi.service.url.URLStreamHandlerService;
 import org.osgi.util.tracker.ServiceTracker;
 import org.osgi.util.tracker.ServiceTrackerCustomizer;
 
@@ -106,6 +108,15 @@ public class Activator
 	public void start(BundleContext bundleContext) throws Exception {
 		_bundleContext = bundleContext;
 
+		Hashtable<String, Object> properties = new Hashtable<String, Object>();
+
+		properties.put(
+			URLConstants.URL_HANDLER_PROTOCOL, new String[] {"webbundle"});
+
+		bundleContext.registerService(
+			URLStreamHandlerService.class.getName(),
+			new WebBundleURLStreamHandlerService() , properties);
+
 		StringBundler sb = new StringBundler(7);
 
 		sb.append("(&(");
@@ -133,54 +144,33 @@ public class Activator
 		for (Bundle bundle : _bundleContext.getBundles()) {
 			Dictionary<String,String> headers = bundle.getHeaders();
 
-			Enumeration<String> keys = headers.keys();
+			String servletContextName = headers.get(
+				OSGiConstants.WEB_CONTEXTPATH);
 
-			while (keys.hasMoreElements()) {
-				String key = keys.nextElement();
-
-				if (key.equals(OSGiConstants.WEB_CONTEXTPATH)) {
-					if ((bundle.getState() == Bundle.ACTIVE)) {
-						try {
-							bundle.stop();
-						}
-						catch (BundleException e) {
-							_log.error(e, e);
-						}
-					}
-
-					try {
-						bundle.start();
-					}
-					catch (BundleException e) {
-						_log.error(e, e);
-					}
-
-					continue;
+			if (Validator.isNotNull(servletContextName)) {
+				try {
+					_webPluginDeployer.doStart(bundle, servletContextName);
+				}
+				catch (Exception e) {
+					_log.error(e, e);
 				}
 			}
 		}
 	}
 
 	protected void checkStoppableBundles() {
-		for (Bundle bundle : _bundleContext.getBundles()) {
+		for (final Bundle bundle : _bundleContext.getBundles()) {
 			Dictionary<String,String> headers = bundle.getHeaders();
 
-			Enumeration<String> keys = headers.keys();
+			String servletContextName = headers.get(
+				OSGiConstants.WEB_CONTEXTPATH);
 
-			while (keys.hasMoreElements()) {
-				String key = keys.nextElement();
-
-				if (key.equals(OSGiConstants.WEB_CONTEXTPATH) &&
-					(bundle.getState() == Bundle.ACTIVE)) {
-
-					try {
-						bundle.stop();
-					}
-					catch (BundleException e) {
-						_log.error(e, e);
-					}
-
-					continue;
+			if (Validator.isNotNull(servletContextName)) {
+				try {
+					_webPluginDeployer.doStop(bundle, servletContextName);
+				}
+				catch (Exception e) {
+					_log.error(e, e);
 				}
 			}
 		}
