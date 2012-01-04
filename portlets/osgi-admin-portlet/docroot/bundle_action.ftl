@@ -27,7 +27,7 @@
 		<#if (permissionChecker.isOmniadmin())>
 			<#if (!expandedView)>
 				<@portlet["renderURL"] var="viewURL">
-					<@portlet["param"] name="ftlPage" value="/edit_bundle.ftl" />
+					<@portlet["param"] name="mvcPath" value="/edit_bundle.ftl" />
 					<@portlet["param"] name="redirect" value=(currentURL) />
 					<@portlet["param"] name="bundleId" value=(bundle.getBundleId()?string) />
 				</@>

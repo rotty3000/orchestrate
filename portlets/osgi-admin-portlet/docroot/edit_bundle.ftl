@@ -13,7 +13,6 @@
  * details.
  */
 -->
-
 <#include "${fullTemplatesPath}/init.ftl" />
 
 <#assign redirect = ParamUtil.getString(request, "redirect") />
@@ -41,7 +40,7 @@
 <@liferay_ui["header"] backURL=(redirect) title=(bundleName) />
 
 <@portlet["actionURL"] var="editBundleURL">
-	<@portlet["param"] name="ftlPage" value="/edit_bundle.ftl" />
+	<@portlet["param"] name="mvcPath" value="/edit_bundle.ftl" />
 </@>
 
 <@aui["form"] action=(editBundleURL) enctype="multipart/form-data" method="post" name="fm">
@@ -160,10 +159,7 @@
 										<#list parsedHeader.entrySet() as entry>
 											<#assign key = entry.key />
 											<#assign value = entry.value />
-
-											<#if ((headerKey == FrameworkConstants.IMPORT_PACKAGE) && !BundleUtil.isPackageSatisfied(bundleContext, key, value.version))>
-												<strong>MISSING</strong>
-											</#if>
+											<#assign unsatisfiedDependency = (headerKey == FrameworkConstants.IMPORT_PACKAGE) && !BundleUtil.isPackageSatisfied(bundleContext, key, value.version) />
 
 											<#assign outputValue = key />
 
@@ -177,7 +173,7 @@
 												</#if>
 											</#list>
 
-											${outputValue}
+											<#if (unsatisfiedDependency)><strong></#if>${outputValue}<#if (unsatisfiedDependency)> (${LanguageUtil.get(pageContext, "unsatisfied")})</strong></#if>
 
 											<#if (entry_has_next)>
 												<br />

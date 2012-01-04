@@ -27,7 +27,7 @@
 
 <#assign portletURL = renderResponse.createRenderURL() />
 
-<#assign void = portletURL.setParameter("ftlPage", "/view.ftl") />
+<#assign void = portletURL.setParameter("mvcPath", "/view.ftl") />
 <#assign void = portletURL.setParameter("tabs1", tabs1) />
 
 <@liferay_ui["error"] key="com.liferay.osgiadmin.portlet.OSGiException">
@@ -37,7 +37,7 @@
 <@liferay_ui["tabs"] names="bundles,install-bundle" url=(portletURL.toString()) />
 
 <@portlet["actionURL"] var="editBundleURL">
-	<@portlet["param"] name="ftlPage" value="/edit_bundle.ftl" />
+	<@portlet["param"] name="mvcPath" value="/edit_bundle.ftl" />
 </@>
 
 <@aui["form"] action=(editBundleURL) enctype="multipart/form-data" method="post" name="fm">
@@ -87,7 +87,7 @@
 			<#assign bundleStartLevel = BundleUtil.getBundleStartLevel(bundle) />
 
 			<@liferay_portlet["renderURL"] varImpl="rowURL">
-				<@portlet["param"] name="ftlPage" value="/edit_bundle.ftl" />
+				<@portlet["param"] name="mvcPath" value="/edit_bundle.ftl" />
 				<@portlet["param"] name="redirect" value=(searchContainer.getIteratorURL()?string) />
 				<@portlet["param"] name="bundleId" value=(bundle.getBundleId()?string) />
 			</@>
@@ -105,9 +105,9 @@
 				orderable=true
 				orderableProperty="symbolicName"
 			>
-				<#assign bundleName = headers[FrameworkConstants.BUNDLE_NAME] />
+				<#assign bundleName = headers[FrameworkConstants.BUNDLE_NAME]!bundle.getSymbolicName() />
 
-				<a href="${rowURL}"><strong>${bundleName!bundle.getSymbolicName()}</strong></a>
+				<a href="${rowURL}"><strong>${bundleName}</strong></a>
 
 				<br/>
 
@@ -198,7 +198,7 @@
 <#elseif (tabs1.equals("install-bundle"))>
 
 	<@portlet["actionURL"] var="editBundleURL">
-		<@portlet["param"] name="ftlPage" value="/edit_bundle.ftl" />
+		<@portlet["param"] name="mvcPath" value="/edit_bundle.ftl" />
 	</@>
 
 	<@aui["form"] action=(editBundleURL) enctype="multipart/form-data" method="post" name="fm">

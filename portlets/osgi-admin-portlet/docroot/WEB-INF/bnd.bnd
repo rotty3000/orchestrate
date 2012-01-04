@@ -7,10 +7,7 @@ Export-Package: content,com.liferay.osgiadmin.portlet
 Import-Package: \
 	aQute.libg.header,\
 	aQute.libg.version,\
-	com.liferay.mvc,\
 	com.liferay.mvc.freemarker,\
-	com.liferay.portlet,\
-	com.liferay.portlet.admin,\
 	com.liferay.portal.kernel.servlet,\
 	com.liferay.portal.kernel.upload,\
 	com.liferay.portal.kernel.util,\
@@ -21,6 +18,8 @@ Import-Package: \
 	com.liferay.portal.security.permission,\
 	com.liferay.portal.theme,\
 	com.liferay.portal.util,\
+	com.liferay.portlet,\
+	com.liferay.portlet.admin,\
 	javax.portlet,\
 	org.osgi.framework,\
 	org.osgi.framework.startlevel,\

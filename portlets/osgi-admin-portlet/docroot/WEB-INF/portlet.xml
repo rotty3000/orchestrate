@@ -11,7 +11,7 @@
 		<display-name>OSGi Admin</display-name>
 		<portlet-class>com.liferay.osgiadmin.portlet.OSGiAdminPortlet</portlet-class>
 		<init-param>
-			<name>view-ftl</name>
+			<name>view-template</name>
 			<value>/view.ftl</value>
 		</init-param>
 		<init-param>
