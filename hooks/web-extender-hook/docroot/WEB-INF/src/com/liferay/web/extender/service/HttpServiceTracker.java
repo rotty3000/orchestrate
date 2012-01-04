@@ -17,11 +17,11 @@ package com.liferay.web.extender.service;
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
 import com.liferay.portal.kernel.util.StringPool;
+import com.liferay.web.extender.internal.WebXML;
+import com.liferay.web.extender.internal.WebXMLLoader;
 import com.liferay.web.extender.servlet.FilterDefinition;
 import com.liferay.web.extender.servlet.ListenerDefinition;
 import com.liferay.web.extender.servlet.ServletDefinition;
-import com.liferay.web.extender.servlet.WebXML;
-import com.liferay.web.extender.servlet.WebXMLLoader;
 
 import java.util.Map;
 

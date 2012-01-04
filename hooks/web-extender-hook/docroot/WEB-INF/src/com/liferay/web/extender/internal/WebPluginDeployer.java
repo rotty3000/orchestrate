@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.web.extender.deploy;
+package com.liferay.web.extender.internal;
 
 import com.liferay.portal.kernel.deploy.hot.HotDeployEvent;
 import com.liferay.portal.kernel.deploy.hot.HotDeployUtil;

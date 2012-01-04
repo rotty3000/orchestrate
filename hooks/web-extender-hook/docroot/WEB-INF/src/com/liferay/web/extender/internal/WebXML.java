@@ -12,7 +12,11 @@
  * details.
  */
 
-package com.liferay.web.extender.servlet;
+package com.liferay.web.extender.internal;
+
+import com.liferay.web.extender.servlet.FilterDefinition;
+import com.liferay.web.extender.servlet.ListenerDefinition;
+import com.liferay.web.extender.servlet.ServletDefinition;
 
 import java.util.HashMap;
 import java.util.Hashtable;

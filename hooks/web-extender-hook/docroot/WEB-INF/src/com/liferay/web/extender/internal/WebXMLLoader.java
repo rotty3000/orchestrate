@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.web.extender.servlet;
+package com.liferay.web.extender.internal;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -21,6 +21,9 @@ import com.liferay.portal.kernel.xml.Element;
 import com.liferay.portal.kernel.xml.SAXReaderUtil;
 import com.liferay.portal.kernel.xml.XPath;
 import com.liferay.util.ContentUtil;
+import com.liferay.web.extender.servlet.FilterDefinition;
+import com.liferay.web.extender.servlet.ListenerDefinition;
+import com.liferay.web.extender.servlet.ServletDefinition;
 
 import java.util.Hashtable;
 import java.util.Map;
@@ -276,7 +279,7 @@ public class WebXMLLoader {
 
 	private static final String _DEFAULT_WEB = ContentUtil.get(
 		WebXMLLoader.class.getClassLoader(),
-		"com/liferay/web/extender/servlet/dependencies/web.xml");
+		"com/liferay/web/extender/internal/dependencies/web.xml");
 	private static String _RESOURCE_PREFIX = "/*.";
 
 	private static final Log _log = LogFactoryUtil.getLog(WebXMLLoader.class);

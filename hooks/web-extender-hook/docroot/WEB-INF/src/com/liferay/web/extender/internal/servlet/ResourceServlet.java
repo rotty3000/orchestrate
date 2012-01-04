@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.web.extender.servlet;
+package com.liferay.web.extender.internal.servlet;
 
 import com.liferay.portal.kernel.servlet.ServletResponseUtil;
 import com.liferay.portal.kernel.util.StringPool;
