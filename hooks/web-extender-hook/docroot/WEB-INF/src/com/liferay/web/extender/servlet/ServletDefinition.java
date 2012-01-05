@@ -19,6 +19,9 @@ import java.util.Hashtable;
 
 import javax.servlet.Servlet;
 
+/**
+ * @author Raymond Augé
+ */
 public class ServletDefinition {
 
 	public ServletDefinition() {

@@ -19,6 +19,9 @@ import java.util.Hashtable;
 
 import javax.servlet.Filter;
 
+/**
+ * @author Raymond Augé
+ */
 public class FilterDefinition {
 
 	public FilterDefinition() {
