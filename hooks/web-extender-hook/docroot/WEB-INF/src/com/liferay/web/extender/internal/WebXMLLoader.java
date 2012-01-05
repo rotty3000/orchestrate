@@ -35,8 +35,6 @@ import javax.servlet.Servlet;
 import org.osgi.framework.Bundle;
 
 /**
- * <a href="WebXMLLoader.java.html"><b><i>View Source</i></b></a>
- *
  * @author Raymond Augé
  */
 public class WebXMLLoader {

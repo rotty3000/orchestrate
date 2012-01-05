@@ -24,8 +24,6 @@ import org.osgi.service.http.HttpService;
 import org.osgi.service.http.NamespaceException;
 
 /**
- * <a href="ExtendedHttpService.java.html"><b><i>View Source</i></b></a>
- *
  * @author Raymond Augé
  */
 public interface ExtendedHttpService extends HttpService {

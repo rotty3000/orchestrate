@@ -26,8 +26,6 @@ import javax.servlet.ServletRequest;
 import javax.servlet.ServletResponse;
 
 /**
- * <a href="BundleFilterChain.java.html"><b><i>View Source</i></b></a>
- *
  * @author Raymond Augé
  */
 public class BundleFilterChain implements FilterChain {

@@ -28,8 +28,6 @@ import javax.servlet.http.HttpServletResponse;
 import org.osgi.service.http.HttpContext;
 
 /**
- * <a href="PortalHttpContext.java.html"><b><i>View Source</i></b></a>
- *
  * @author Raymond Augé
  */
 public class PortalHttpContext implements HttpContext {

@@ -23,8 +23,6 @@ import java.util.Hashtable;
 import java.util.Map;
 
 /**
- * <a href="WebXML.java.html"><b><i>View Source</i></b></a>
- *
  * @author Raymond Augé
  */
 public class WebXML {
