@@ -12,7 +12,7 @@
  * details.
  */
 
-package com.liferay.web.extender.internal.servlet;
+package com.liferay.web.extender.servlet;
 
 import com.liferay.portal.kernel.log.Log;
 import com.liferay.portal.kernel.log.LogFactoryUtil;
@@ -27,7 +27,6 @@ import com.liferay.portal.osgi.OSGiConstants;
 import com.liferay.portal.util.PortalUtil;
 import com.liferay.web.extender.service.ExtendedHttpService;
 import com.liferay.web.extender.service.HttpServiceFactory;
-import com.liferay.web.extender.servlet.BundleServletContext;
 
 import java.io.IOException;
 

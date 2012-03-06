@@ -21,9 +21,9 @@ import com.liferay.portal.kernel.util.StringBundler;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.osgi.OSGiConstants;
 import com.liferay.portal.struts.StrutsActionRegistryUtil;
-import com.liferay.web.extender.internal.servlet.OSGiServlet;
 import com.liferay.web.extender.internal.webbundle.WebBundleURLStreamHandlerService;
 import com.liferay.web.extender.servlet.BundleServletConfig;
+import com.liferay.web.extender.servlet.OSGiServlet;
 
 import java.util.Dictionary;
 import java.util.Hashtable;

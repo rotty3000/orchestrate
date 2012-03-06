@@ -57,6 +57,11 @@ public class WebPluginDeployer implements BundleListener {
 		_bundleContext = bundleContext;
 		_portletServlet = portletServlet;
 
+		_eventAdminTracker = new ServiceTracker<EventAdmin, EventAdmin>(
+			_bundleContext, EventAdmin.class.getName(), null);
+
+		_eventAdminTracker.open();
+
 		StringBundler sb = new StringBundler(7);
 
 		sb.append("(&(");
@@ -74,11 +79,6 @@ public class WebPluginDeployer implements BundleListener {
 				_bundleContext, filter, null);
 
 		_servletContextTracker.open();
-
-		_eventAdminTracker = new ServiceTracker<EventAdmin, EventAdmin>(
-			_bundleContext, EventAdmin.class.getName(), null);
-
-		_eventAdminTracker.open();
 	}
 
 	public void bundleChanged(BundleEvent bundleEvent) {
@@ -111,7 +111,8 @@ public class WebPluginDeployer implements BundleListener {
 
 		sendEvent(bundle, "org/osgi/service/web/DEPLOYING", null, false);
 
-		ServletContext servletContext = ServletContextPool.get(servletContextName);
+		ServletContext servletContext = ServletContextPool.get(
+			servletContextName);
 
 		if (servletContext != null) {
 			sendEvent(bundle, "org/osgi/service/web/FAILED", null, true);

@@ -23,8 +23,6 @@ import com.liferay.portal.kernel.util.StringPool;
 import com.liferay.portal.kernel.util.Validator;
 import com.liferay.portal.osgi.OSGiConstants;
 import com.liferay.portal.util.PortalUtil;
-import com.liferay.web.extender.internal.servlet.OSGiServlet;
-import com.liferay.web.extender.internal.servlet.ResourceServlet;
 import com.liferay.web.extender.service.HttpServiceTracker;
 
 import java.io.InputStream;
